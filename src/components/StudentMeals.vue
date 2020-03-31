@@ -1,6 +1,21 @@
 <template>
+
   <div>
-    <h2>DISTRICT SITES</h2>
+    <div
+      v-show="loading"
+      class="mtm center"
+    >
+      <i class="fas fa-spinner fa-spin fa-3x" />
+    </div>
+  <div
+      v-show="failure"
+      class="h3 mtm center"
+    >
+      Sorry, there was a problem. Please try again.
+    </div>
+    <div v-show="!loading && !failure">
+    <h5><b>District schools open Mondays and Thursdays, 9 a.m. – noon.</b></h5>
+    <p>Families will receive six meals per student—3 breakfasts and 3 lunches</p>
      <div class="search">
       <input
         id="district-search-bar"
@@ -22,7 +37,15 @@
         <i class="fas fa-times " />
       </button>
     </div>
-    <table>
+    <div
+      v-show="!loading && districtEmpty"
+      class="h3 mtm center"
+    >
+      Sorry, there are no results.
+    </div>
+    <table
+     v-show="!districtEmpty && !loading && !failure"
+     >
       <thead>
         <tr>
           <th
@@ -43,7 +66,7 @@
       </tr>
       </tbody>
     </table>
-    <h2>CHARTER SITES</h2>
+    <h5><b>Charter School locations open on varying days from 9 a.m. to noon. (contact schools or visit their websites for exact days)</b></h5>
     <div class="search">
       <input
         id="charter-search-bar"
@@ -65,7 +88,15 @@
         <i class="fas fa-times " />
       </button>
     </div>
-    <table>
+    <div
+      v-show="!loading && charterEmpty"
+      class="h3 mtm center"
+    >
+      Sorry, there are no results.
+    </div>
+     <table
+      v-show="!charterEmpty && !loading && !failure"
+     >
       <thead>
         <tr>
           <th
@@ -86,8 +117,15 @@
       </tr>
       </tbody>
     </table>
-    <h2>PHA SITES</h2>
-    <table>
+    <h5><b>The Philadelphia Housing Authority has six community centers open for “grab-and-go” meals for breakfast and lunch from Monday through Friday, 9 a.m. to noon.</b></h5>    <div
+      v-show="!loading && PHAEmpty"
+      class="h3 mtm center"
+    >
+      Sorry, there are no results.
+    </div>
+     <table
+      v-show="!PHAEmpty && !loading && !failure"
+     >
       <thead>
         <tr>
           <th
@@ -95,7 +133,7 @@
             :class="PHASort"
             @click="togglePHA()"
           >
-            <span>School</span>
+            <span>PHA community center</span>
           </th>
           <th>Address (ZIP code)</th>
         </tr>
@@ -108,6 +146,7 @@
       </tr>
       </tbody>
     </table>
+    </div>
   </div>
 </template>
 
@@ -173,12 +212,43 @@ export default {
       this.filteredPHA = this.searchTable(this.PHASites, "PHA", val)
     },
 
+    filteredDistrict() {
+      if (!this.failure) {
+        if (this.filteredDistrict.length == 0) {
+          this.districtEmpty = true;
+        } else  {
+          this.districtEmpty = false;
+        }
+      }
+    },
+
+     filteredCharter() {
+      if (!this.failure) {
+        if (this.filteredCharter.length == 0) {
+          this.charterEmpty = true;
+        } else  {
+          this.charterEmpty = false;
+        }
+      }
+    },
+
+    filteredPHA() {
+      if (!this.failure) {
+        if (this.filteredPHA.length == 0) {
+          this.PHAEmpty = true;
+        } else  {
+          this.PHAEmpty = false;
+        }
+      }
+    },
+
   },
   mounted() {
     this.fetchData()
   },
   methods: {
     fetchData: function() {
+      this.loading = true;
       axios.get(endpoint)
       .then((response) => {
         this.mealSites = response.data.features;
@@ -186,11 +256,15 @@ export default {
         response.data.features.forEach((item)=> {
           this.mealSites.push(item.attributes);
         })
+        this.failure = false;
+        this.loading = false;
 
         this.splitIntoArrays();
       })
       .catch((e) => {
         console.log(e)
+        this.loading = false;
+        this.failure = true;
       })
     },
 

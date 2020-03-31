@@ -5,4 +5,4 @@ Vue.config.productionTip = false
 
 new Vue({
   render: h => h(App),
-}).$mount('#vue-app')
+}).$mount('#vue-app-student')
