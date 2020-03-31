@@ -4,15 +4,21 @@
     <table>
       <thead>
         <tr>
-          <td>Name</td>
-          <td>Address</td>
+          <th
+            class="table-sort title"
+            :class="districtSort"
+            @click="toggleDist()"
+          >
+            <span>School</span>
+          </th>
+          <th>Address</th>
         </tr>
       </thead>
       <tbody>
-      <tr v-for="site in districtSites" 
-          :key="site.attributes.OBJECTID">
-          <td>{{site.attributes.SiteName }}</td>
-         <td>{{ site.attributes.ADDRESS }} {{ site.attributes.ZipCode}}</td>
+      <tr v-for="site in filteredDistrict" 
+          :key="site.OBJECTID">
+          <td>{{site.SiteName }}</td>
+         <td>{{ site.ADDRESS }} {{ site.ZipCode}}</td>
       </tr>
       </tbody>
     </table>
@@ -20,15 +26,21 @@
     <table>
       <thead>
         <tr>
-          <td>Name</td>
-          <td>Address</td>
+          <th
+            class="table-sort title"
+            :class="charterSort"
+            @click="toggleCharter()"
+          >
+            <span>School</span>
+          </th>
+          <th>Address</th>
         </tr>
       </thead>
       <tbody>
-      <tr v-for="site in charterSites" 
-          :key="site.attributes.OBJECTID">
-          <td>{{site.attributes.SiteName }}</td>
-         <td>{{ site.attributes.ADDRESS }} {{ site.attributes.ZipCode}}</td>
+      <tr v-for="site in filteredCharter" 
+          :key="site.OBJECTID">
+          <td>{{site.SiteName }}</td>
+         <td>{{ site.ADDRESS }} {{ site.ZipCode}}</td>
       </tr>
       </tbody>
     </table>
@@ -36,15 +48,21 @@
     <table>
       <thead>
         <tr>
-          <td>Name</td>
-          <td>Address</td>
+          <th
+            class="table-sort title"
+            :class="PHASort"
+            @click="togglePHA()"
+          >
+            <span>School</span>
+          </th>
+          <th>Address</th>
         </tr>
       </thead>
       <tbody>
-      <tr v-for="site in PHASites" 
-          :key="site.attributes.OBJECTID">
-          <td>{{site.attributes.SiteName }}</td>
-         <td>{{ site.attributes.ADDRESS }} {{ site.attributes.ZipCode}}</td>
+      <tr v-for="site in filteredPHA" 
+          :key="site.OBJECTID">
+          <td>{{site.SiteName }}</td>
+         <td>{{ site.ADDRESS }} {{ site.ZipCode}}</td>
       </tr>
       </tbody>
     </table>
@@ -65,6 +83,18 @@ export default {
       districtSites: [],
       charterSites: [],
       PHASites: [],
+      filteredDistrict: [],
+      filteredCharter: [],
+      filteredPHA: [],
+      districtSort: "desc",
+      charterSort: "desc",
+      PHASort: "desc",
+      loading: false,
+      failure: false,
+
+      dEmpty: false,
+      cEmpty: false,
+      pEmpty: false,
     }
   },
   mounted() {
@@ -75,6 +105,11 @@ export default {
       axios.get(endpoint)
       .then((response) => {
         this.mealSites = response.data.features;
+
+        response.data.features.forEach((item)=> {
+          this.mealSites.push(item.attributes);
+        })
+
         this.splitIntoArrays();
       })
       .catch((e) => {
@@ -82,15 +117,45 @@ export default {
       })
     },
 
+    toggleDist() {
+      this.districtSort = this.districtSort === 'asc' ? 'desc' : 'asc';
+      this.filteredDistrict = this.sortSites(this.filteredDistrict, this.districtSort)
+    },
+
+    toggleCharter() {
+      this.charterSort = this.charterSort === 'asc' ? 'desc' : 'asc';
+      this.filteredCharter = this.sortSites(this.filteredCharter, this.charterSort)
+    },
+
+    togglePHA() {
+      this.PHASort = this.PHASort === 'asc' ? 'desc' : 'asc';
+      this.filteredPHA = this.sortSites(this.filteredPHA, this.PHASort)
+    },
+
+    sortSites:function(toSort, mod) {
+      return toSort.sort((a, b) => {
+         let modifier = -1;
+          if(mod === 'desc') {
+            modifier = 1;
+          }
+        var textA = a.SiteName.toUpperCase();
+        var textB = b.SiteName.toUpperCase();
+          return (textA < textB) ? ( -1 * modifier) : (textA > textB) ? (1 * modifier) : 0;
+      });
+    },
+
     splitIntoArrays: function () {
-      let districtArr = this.mealSites.filter(site => site.attributes.Status === "District");
+      let districtArr = this.mealSites.filter(site => site.Status === "District");
       this.districtSites = districtArr;
+      this.filteredDistrict = this.sortSites(districtArr, this.districtSort);
 
-      let charterArr = this.mealSites.filter(site => site.attributes.Status === "Charter");
+      let charterArr = this.mealSites.filter(site => site.Status === "Charter");
       this.charterSites = charterArr;
+      this.filteredCharter = this.sortSites(charterArr, this.charterSort);
 
-      let PHAArr = this.mealSites.filter(site => site.attributes.Status === "PHA");
+      let PHAArr = this.mealSites.filter(site => site.Status === "PHA");
       this.PHASites = PHAArr;
+      this.filteredPHA = this.sortSites(PHAArr, this.PHASort);
     }
   },
 }
