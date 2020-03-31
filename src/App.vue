@@ -17,7 +17,12 @@ export default {
 </script>
 
 <style>
-thead tr td {
+/* #vue-app {
+  width: 70rem;
+  margin: 0 auto;
+} */
+
+thead tr th {
     width: 50%;
   }
 </style>
