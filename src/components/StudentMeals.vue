@@ -75,7 +75,7 @@
         </thead>
         <tbody>
           <tr v-for="site in filteredCharter" :key="site.OBJECTID">
-            <td>{{site.SiteName }}</td>
+            <td>{{ site.SiteName }}</td>
             <td>{{ site.ADDRESS }} ({{ site.ZipCode}})</td>
           </tr>
         </tbody>
@@ -95,7 +95,7 @@
         </thead>
         <tbody>
           <tr v-for="site in filteredPHA" :key="site.OBJECTID">
-            <td>{{site.SiteName }}</td>
+            <td>{{ site.SiteName }}</td>
             <td>{{ site.ADDRESS }} ({{ site.ZipCode}})</td>
           </tr>
         </tbody>

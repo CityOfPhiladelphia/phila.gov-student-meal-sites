@@ -1,5 +1,5 @@
 <template>
-  <div id="vue-app-student">
+  <div id="vue-app-2">
     <StudentMeals />
   </div>
 </template>
